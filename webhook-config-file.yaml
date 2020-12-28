@@ -1,0 +1,28 @@
+# Kubernetes API version
+apiVersion: v1
+kind: Config
+
+# clusters refers to the auth service.
+clusters:
+  - name: test-auth-server
+    cluster:
+      insecure-skip-tls-verify: true
+      server: <insert webhook listener URL> # URL of remote service to query. Must use 'https'.
+
+# users refers to the API server's webhook configuration.
+users:
+  - name: karl-minikube
+    user:
+      # Just to demo and avoid creating certs, have apiserver use a token to auth itself to the webhook listener
+      #
+      # client-certificate: /etc/ca-certificates/public.pem # cert for the webhook plugin to use
+      # client-key: /etc/ca-certificates/private.pem          # key matching the cert
+      token: apiserver-bearer-token
+
+# kubeconfig files require a context. Provide one for the API server.
+current-context: webhook
+contexts:
+- context:
+    cluster: test-auth-server
+    user: karl-minikube
+  name: webhook
